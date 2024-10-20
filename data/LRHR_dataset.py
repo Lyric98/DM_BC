@@ -125,6 +125,7 @@ class SRDataset(Dataset):
         return {'HR': hr_img, 'SR': lr_img, 'Index': i}
     def __len__(self):
         return len(self.images)
+        
 class ImageTransforms(object):
     """
     Image transformation pipeline.
