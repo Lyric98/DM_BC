@@ -16,10 +16,12 @@ def main():
         cpus_per_task=1,
         # gpus_per_node=2,  # equivalent to --gres=gpu:2
         mem_gb=30,
-        slurm_gres='gpu:rtx8000:1',
+        slurm_gres='gpu:1',
+        # slurm_gres='gpu:rtx8000:1',
         time=60*12,  # minutes, equivalent to --time=48:00:00
         job_name="DMBC",
-        account="pr_174_general"
+        account="biostats",
+        # account="pr_174_general"
     )
 
     # Submit the job
