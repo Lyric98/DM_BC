@@ -1,5 +1,6 @@
 legacy/*
 experiments/*
+wandb/*
 
 # every __pycache__ directory
 */__pycache__/*

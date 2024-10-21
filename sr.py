@@ -6,6 +6,7 @@ import logging
 import core.logger as Logger
 import core.metrics as Metrics
 import os
+import wandb
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -34,6 +35,12 @@ if __name__ == "__main__":
     Logger.setup_logger('val', opt['path']['log'], 'val', level=logging.INFO)
     logger = logging.getLogger('base')
     logger.info(Logger.dict2str(opt))
+
+    # wandb
+    if opt["enable_wandb"]:
+        project_name = opt["wandb"]["project"]
+        print(f"wandb project: {project_name}")
+        wandb.init(project=project_name)
 
     # dataset
     for phase, dataset_opt in opt['datasets'].items():
@@ -81,6 +88,12 @@ if __name__ == "__main__":
                         #tb_logger.add_scalar(k, v, current_step)
                     logger.info(message)
 
+                    wandb.log({
+                        "epoch": current_epoch,
+                        "step": current_step,
+                        **logs})
+
+
                 # validation
                 if current_step % opt['train']['val_freq'] == 0:
                     avg_psnr = 0.0
@@ -124,7 +137,14 @@ if __name__ == "__main__":
                     logger_val = logging.getLogger('val')  # validation logger
                     logger_val.info('<epoch:{:3d}, iter:{:8,d}> psnr: {:.4e}, ssim: {:.4e}'.format(
                         current_epoch, current_step, avg_psnr, avg_ssim))
-
+                    
+                    # Log metrics to wandb
+                    wandb.log({
+                        "epoch": current_epoch,
+                        "step": current_step,
+                        "avg_psnr": avg_psnr,
+                        "avg_ssim": avg_ssim
+                    })
                 if current_step % opt['train']['save_checkpoint_freq'] == 0:
                     logger.info('Saving models and training states.')
                     diffusion.save_network(current_epoch, current_step)

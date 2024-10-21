@@ -10,3 +10,4 @@ pandas
 opencv-python
 PyWavelets
 submitit
+wandb
