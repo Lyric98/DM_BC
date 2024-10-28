@@ -27,21 +27,24 @@ class CBISDataset(torch.utils.data.Dataset):
             os.makedirs(self.save_dir_RGB, exist_ok=True)
 
     def process_single_image(self, img_path):
-        """Function to process a single image."""
+        """Function to process a single image with a shorter folder name."""
         try:
+            # Extract only the last segment of the folder name after the last dot
+            folder_name = os.path.basename(os.path.dirname(img_path)).split('.')[-1]
+            image_name = os.path.basename(img_path).replace('.jpg', '.png')
+            
             with Image.open(img_path) as img:
                 # Convert the image to RGB
                 rgb_img = img.convert('RGB')
 
-                # Create the filenames for saving the PNGs
-                save_path_L = os.path.join(self.save_dir_L, os.path.basename(img_path).replace('.jpg', '.png'))
-                save_path_RGB = os.path.join(self.save_dir_RGB, os.path.basename(img_path).replace('.jpg', '.png'))
+                # Create unique filenames with shortened folder name
+                save_path_L = os.path.join(self.save_dir_L, f"{folder_name}_{image_name}")
+                save_path_RGB = os.path.join(self.save_dir_RGB, f"{folder_name}_{image_name}")
 
-                # Save the original grayscale image and RGB image as PNG
                 img.save(save_path_L, 'PNG')
                 rgb_img.save(save_path_RGB, 'PNG')
 
-                return f"Processed: {os.path.basename(img_path)}"
+                return f"Processed: {folder_name}/{image_name}"
         except Exception as e:
             return f"Error processing {img_path}: {e}"
 
@@ -72,83 +75,6 @@ class CBISDataset(torch.utils.data.Dataset):
 
         return img
 
-# Example usage:
-# dataset = CBISDataset('path_to_json.json', save=True, save_dir='dataset/CBIS_full')
-# dataset.process_images_multiprocess()
-
-# import os
-# import pandas as pd
-# import torch
-
-# from PIL import Image
-# from torchvision import transforms
-
-# class CBISDataset(torch.utils.data.Dataset):
-#     def __init__(self, json, transform=None, save=False, save_dir=None):
-#         assert save and save_dir, "save_dir must be provided if save is True"
-#         self.json_path = json
-#         # # Extract the image paths
-#         # self.transform = transforms.Compose([
-#         #     transforms.Resize((1024, 1024)),  
-#         #     transforms.ToTensor(),
-#         # ])
-
-#         # get the list of image paths
-#         self.image_paths = pd.read_json(json, orient='records')[0].tolist()
-
-#         save = True
-#         save_dir = 'dataset/CBIS_full'
-#         # read them and save them as png files in the save_dir
-#         if save:
-#             # Ensure the save directory exists
-#             os.makedirs(save_dir, exist_ok=True)
-#             os.makedirs(os.path.join(save_dir, 'full_image_L'), exist_ok=True)
-#             os.makedirs(os.path.join(save_dir, 'full_image_RGB'), exist_ok=True)
-
-#             save_dir_L = os.path.join(save_dir, 'full_image_L')
-#             save_dir_RGB = os.path.join(save_dir, 'full_image_RGB')
-
-#             # Loop through the image paths, open each image, and save as PNG
-#             for img_path in self.image_paths:
-#                 try:
-#                     with Image.open(img_path) as img:
-#                         # Create the filename for saving the PNG
-#                         print(img.size)
-#                         rgb_img = img.convert('RGB')
-#                         save_path_L = os.path.join(save_dir_L, os.path.basename(img_path).replace('.jpg', '.png'))
-#                         save_path_RGB = os.path.join(save_dir_RGB, os.path.basename(img_path).replace('.jpg', '.png'))
-#                         # Save the image as PNG
-#                         img.save(save_path_L, 'PNG')
-#                         rgb_img.save(save_path_RGB, 'PNG')
-#                         print(f"Saved {save_path_L}")
-#                         # print(f"Saved {save_path}")
-#                 except Exception as e:
-#                     print(f"Error processing {img_path}: {e}")
-        
-#         breakpoint()
-
-###############################################################
-
-#     def __len__(self):
-#         return len(self.image_paths)
-    
-#     def __getitem__(self, idx):
-#         img_path = self.image_paths[idx]
-#         image = Image.open(img_path).convert('RGB')
-
-#         print(f"Original Image: {self.image_files[idx]}, Size: {image.size}")
-
-#         if self.transform:
-#             image = self.transform(image)
-
-#         print(f"Transformed Image: {self.image_files[idx]}, Size: {image.shape}")
-
-#         if self.save_dir:
-#             transformed_image = transforms.ToPILImage()(image)
-#             transformed_image_path = os.path.join(self.save_dir, self.image_files[idx])
-#             transformed_image.save(transformed_image_path)
-#             print(f"Saved transformed image to: {transformed_image_path}")
-
 
 def get_cropped_data(datacsv_path):
     # Load the CSV file
@@ -169,6 +95,7 @@ def get_cropped_data(datacsv_path):
 
     # Save to a json
     image_paths.to_json('cropped_image_paths.json', orient='records')
+
 
 def get_full_mammogram_images(datacsv_path):
     # Load the CSV file
@@ -191,7 +118,6 @@ def get_full_mammogram_images(datacsv_path):
     image_paths.to_json('full_mammogram_image_paths.json', orient='records')
 
 
-
 def get_ROI_mask_images(datacsv_path):
     # Load the CSV file
     # df = pd.read_csv('dataset/CBIS-DDSM/csv/dicom_info.csv')
@@ -211,7 +137,6 @@ def get_ROI_mask_images(datacsv_path):
 
     # save to a json file
     image_paths.to_json('ROI_mask_image_paths.json', orient='records')
-
 
 
 def read_data(csv_path):
