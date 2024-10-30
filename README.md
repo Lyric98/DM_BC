@@ -1,4 +1,4 @@
-# Waving Goodbye to Low-Res: A Diffusion-Wavelet Approach for Image Super-Resolution
+# A Diffusion-Wavelet Approach for  Enhancing Low-quality Mammography Images
 This work presents a novel Diffusion-Wavelet (DiWa) approach for Single-Image Super-Resolution (SISR). It leverages the strengths of Denoising Diffusion Probabilistic Models (DDPMs) and Discrete Wavelet Transformation (DWT). By enabling DDPMs to operate in the DWT domain, our DDPM models effectively hallucinate high-frequency information for super-resolved images on the wavelet spectrum, resulting in high-quality and detailed reconstructions in image space. 
 
 ## reference
