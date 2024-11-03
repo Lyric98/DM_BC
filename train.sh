@@ -1,15 +1,15 @@
-#!/bin/bash 
+#!/bin/sh
+#
+#SBATCH --account=biostats        # Replace ACCOUNT with your group account name
+#SBATCH --job-name=DMBC           # The job name.
+#SBATCH -c 1                      # The number of cpu cores to use
+#SBATCH --gres=gpu:2              # gpu number
+#SBATCH -t 0-12:00                 # Runtime in D-HH:MM
+#SBATCH -N 1                      # Nodes required for the job.
+#SBATCH --mem-per-cpu=50gb        # The memory the job will use per cpu core
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=yl5465@cumc.columbia.edu
 
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=1
-#SBATCH --gres=gpu:2
-#SBATCH --time=48:00:00
-#SBATCH --mem=80GB
-#SBATCH --job-name=DMBC
-#SBATCH --mail-type=BEGIN,END
-#SBATCH --mail-user=zj2086@nyu.edu
-#SBATCH --output=experiments/FFHQ512.out
-#SBATCH --account=pr_174_general
+ 
 
-python sr.py -p train -c config/sr_wave_64_512FFHQ.json
+python sr.py -p train -c config/sr_wave_64_512CBIS.json -enable_wandb -log_wandb_ckpt -log_eval
