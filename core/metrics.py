@@ -2,6 +2,14 @@ import math
 import numpy as np
 import cv2
 from torchvision.utils import make_grid
+import pyiqa
+import torch
+
+# Initialize device and `pyiqa` metrics
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+clipiqa_metric = pyiqa.create_metric('clipiqa', device=device)
+musiq_metric = pyiqa.create_metric('musiq', device=device)
+lpips_metric = pyiqa.create_metric('lpips', device=device)
 
 
 def tensor2img(tensor, out_type=np.uint8, min_max=(-1, 1)):
@@ -90,3 +98,24 @@ def calculate_ssim(img1, img2):
             return ssim(np.squeeze(img1), np.squeeze(img2))
     else:
         raise ValueError('Wrong input image dimensions.')
+
+
+def calculate_lpips(img1, img2):
+    '''Calculate LPIPS using pyiqa'''
+    img1_tensor = preprocess_img(img1)
+    img2_tensor = preprocess_img(img2)
+    return lpips_metric(img1_tensor, img2_tensor).item()
+
+def calculate_clip_iqa(img):
+    '''Calculate CLIPIQA using pyiqa'''
+    img_tensor = preprocess_img(img)
+    return clipiqa_metric(img_tensor).item()
+
+def calculate_musiq(img):
+    '''Calculate MUSIQ using pyiqa'''
+    img_tensor = preprocess_img(img)
+    return musiq_metric(img_tensor).item()
+
+def preprocess_img(img):
+    '''Converts a numpy image to a torch tensor in the range [0, 1]'''
+    return torch.from_numpy(img).permute(2, 0, 1).unsqueeze(0).float().to(device) / 255.0
