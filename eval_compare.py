@@ -22,7 +22,8 @@ if __name__ == "__main__":
     avg_ssim = 0.0
     avg_lpips = 0.0
     avg_lpips_vgg = 0.0
-
+    avg_clip_iqa = 0.0
+    avg_musiq = 0.0
     idx = 0
     for rname, fname in zip(real_names, fake_names):
         idx += 1
@@ -34,24 +35,36 @@ if __name__ == "__main__":
         sr_img = np.array(Image.open(fname))
         psnr = Metrics.calculate_psnr(sr_img, hr_img)
         ssim = Metrics.calculate_ssim(sr_img, hr_img)
+        clip_iqa = Metrics.calculate_clip_iqa(sr_img)
+        musiq = Metrics.calculate_musiq(sr_img)
         sr_img = torch.tensor(sr_img).permute(2, 0, 1).unsqueeze(0)
         hr_img = torch.tensor(hr_img).permute(2, 0, 1).unsqueeze(0)
-        lpips = loss_fn_alex(sr_img, hr_img).item()
+        lpips1 = loss_fn_alex(sr_img, hr_img).item()
         lpips_vgg = loss_fn_vgg(sr_img, hr_img).item()
+
+
         avg_psnr += psnr
         avg_ssim += ssim
-        avg_lpips += lpips
+        avg_lpips += lpips1
         avg_lpips_vgg += lpips_vgg
+        avg_clip_iqa += clip_iqa
+        avg_musiq += musiq
+
         if idx % 1 == 0:
-            print('Image:{}, PSNR:{:.4f}, SSIM:{:.4f}, LPIPS:{:.4f}, LPIPS-VGG:{:.4f}'.format(idx, psnr, ssim, lpips, lpips_vgg))
+            print('Image:{}, PSNR:{:.4f}, SSIM:{:.4f}, LPIPS:{:.4f}, LPIPS-VGG:{:.4f}, CLIP-IQA:{:.4f}, MUSIQ:{:.4f}'.format(idx, psnr, ssim, lpips1, lpips_vgg, clip_iqa, musiq))
+            #print('Image:{}, PSNR:{:.4f}, SSIM:{:.4f}, LPIPS:{:.4f}, LPIPS-VGG:{:.4f}'.format(idx, psnr, ssim, lpips, lpips_vgg))
 
     avg_psnr = avg_psnr / idx
     avg_ssim = avg_ssim / idx
     avg_lpips = avg_lpips / idx
     avg_lpips_vgg = avg_lpips_vgg / idx
+    avg_clip_iqa = avg_clip_iqa / idx
+    avg_musiq = avg_musiq / idx
 
     # log
     print('# Validation # PSNR: {:.4e}'.format(avg_psnr))
     print('# Validation # SSIM: {:.4e}'.format(avg_ssim))
     print('# Validation # LPIPS: {:.4e}'.format(avg_lpips))
     print('# Validation # LPIPS-VGG: {:.4e}'.format(avg_lpips_vgg))
+    print('# Validation # CLIP-IQA: {:.4e}'.format(avg_clip_iqa))
+    print('# Validation # MUSIQ: {:.4e}'.format(avg_musiq))

@@ -10,6 +10,10 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=yl5465@cumc.columbia.edu
 
- 
 
-python sr_compare.py -p train -c config/sr_wave_64_512CBIS_compare.json -enable_wandb -log_wandb_ckpt -log_eval
+python sr.py -p val -c config/sr_wave_64_512CBIS.json
+
+# Quantitative evaluation alone using SSIM/PSNR metrics on given result root
+# python eval.py -p [result root]
+
+# python sr.py -p train -c config/sr_wave_64_512CBIS.json -enable_wandb -log_wandb_ckpt -log_eval

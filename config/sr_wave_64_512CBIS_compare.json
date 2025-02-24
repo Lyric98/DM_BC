@@ -11,31 +11,33 @@
         "checkpoint": "checkpoint",
         // "resume_state": null
         // "resume_state": "experiments/wave_64_230115_220832/checkpoint/I950000_E465" //pretrain model or training state
-        "resume_state": "experiments/wave_64_241105_205438/checkpoint/I12000_E36"
+        "resume_state": "experiments/wave_64_241112_204127/checkpoint/I18000_E180"
     },
     "datasets": {
         "train": {
-            "name": "FFHQ",
-            "mode": "HR", // whether need LR img
-            "dataroot": "dataset/CBIS_full_center_crop_64_512",
-            "datatype": "img", //lmdb or img, path of img files
-            "l_resolution": 64, // low resolution need to super_resolution
-            "r_resolution": 512, // high resolution
+            "name": "crop1000_byzhxiaofeng",
+            "mode": "HR",
+            "dataroot": "dataset/crop1000_byzhxiaofeng_64_512",
+            "datatype": "img", 
+            "start_idx": 0,
+            "data_len": 800,
             "batch_size": 8,
-            "num_workers": 32,
-            "use_shuffle": true,
-            "data_len": -1 // -1 represents all data used in train
+            "num_workers": 1,
+            "l_resolution": 64, // low resolution need to super_resolution
+            "r_resolution": 512 // high resolution
         },
         "val": {
-            "name": "FFHQ",
+            "name": "crop1000_byzhxiaofeng",
+            "dataroot": "dataset/crop1000_byzhxiaofeng_64_512",
             "mode": "HR",
-            "dataroot": "dataset/CBIS_full_center_crop_64_512",
             "datatype": "img", //lmdb or img, path of img files
+            "start_idx": 900,
+            "data_len": 100,
             "l_resolution": 64,
-            "r_resolution": 512,
-            "data_len": 50 // data length in validation 
+            "r_resolution": 512
         }
     },
+    
     "model": {
         "which_model_G": "wave", // use the ddpm or sr3 network structure
         "finetune_norm": false,
@@ -82,7 +84,7 @@
         "n_iter": 1000000,
         "val_freq": 1e2,
         "save_checkpoint_freq": 1e3,
-        "print_freq": 50,
+        "print_freq": 5,
         "optimizer": {
             "type": "adamw",
             "lr": 2e-5,
